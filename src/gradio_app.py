@@ -1,9 +1,52 @@
+from typing import List
+
 import gradio as gr
 
+from src.prediction_service import Prediction, PredictionItem, predict
 
-def choosistant(review_text, procon="Benefits"):
-    # waiting for model
-    return "none yet" + " " + review_text
+
+def convert_prediction_items_to_text(
+    items: List[PredictionItem], bullet: str, type_singular: str, type_plural: str
+) -> str:
+    """Converts a list of `PredictionItem`s to a text that can be displayed in the UI."""
+    result_text = ""
+    if len(items) == 0:
+        result_text += f"No {type_singular} found.\n"
+    else:
+        result_text += "The model found following "
+        if len(items) == 1:
+            result_text += f"{type_singular}:\n"
+        else:
+            result_text += f"{type_plural}:\n"
+        for item in items:
+            result_text += f" {bullet} {item.text} [score: {item.score:0.2f}]\n"
+    return result_text
+
+
+def choosistant(review_text):
+    # Let the prediction service do its magic.
+    prediction: Prediction = predict(review_text)
+
+    # Convert the prediction to a text that can be displayed in the UI.
+    result_text = "Here is the result of prediction.\n\n"
+
+    result_text += convert_prediction_items_to_text(
+        items=prediction.non_empty_benefits,
+        bullet="😁",
+        type_singular="benefit",
+        type_plural="benefits",
+    )
+
+    result_text += "\n"
+
+    result_text += convert_prediction_items_to_text(
+        items=prediction.non_empty_drawbacks,
+        bullet="😐",
+        type_singular="drawback",
+        type_plural="drawback",
+    )
+
+    return result_text
 
 
 text_input = gr.Textbox(
@@ -21,4 +64,4 @@ iface = gr.Interface(
     examples=[["The top side came ripped off"], ["The gear is child friendly"]],
 )
 
-iface.launch(server_port=8090)
+iface.launch(debug=True)
