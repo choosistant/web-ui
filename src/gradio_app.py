@@ -64,4 +64,4 @@ iface = gr.Interface(
     examples=[["The top side came ripped off"], ["The gear is child friendly"]],
 )
 
-iface.launch(debug=True)
+iface.launch(debug=True, server_port=8090)
