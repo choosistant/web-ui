@@ -79,3 +79,6 @@ def predict(review_text) -> Prediction:
         labels=result["labels"],
         scores=result["scores"],
     )
+
+if __name__=="__main__":
+    predict("I love this as it doesn't really have a scent and it's very lightweight. It doesn't make my skin oily and personally helps clear my acne faster sometimes. I have gifted it a few times and they loved it.")
