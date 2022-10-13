@@ -20,10 +20,11 @@ class PredictionItem:
 
 class Prediction:
     def __init__(
-        self, segments: List[str], labels: List[str], scores: List[float]
+        self, segments: List[str], labels: List[str], scores: List[float], id: str
     ) -> None:
         self._benefits = []
         self._drawbacks = []
+        self._id = id
 
         for segment, label, score in zip(segments, labels, scores):
             item = PredictionItem(label=label, text=segment, score=score)
@@ -51,6 +52,10 @@ class Prediction:
     def non_empty_drawbacks(self) -> List[PredictionItem]:
         return self._filter_items(self._drawbacks)
 
+    @property
+    def id(self) -> str:
+        return self._id
+
     def _filter_items(self, items: List[PredictionItem]) -> List[PredictionItem]:
         non_empty_items = [item for item in items if item.text.strip() != ""]
         sorted_items = sorted(
@@ -69,13 +74,16 @@ def predict(review_text) -> Prediction:
     payload = {
         "url": "https://localhost/",
         "review_text": review_text,
+        # "model_type": 'qa','seq2seq'
     }
     resp = requests.post(url=API_SERVER_URL, json=payload)
     if resp.status_code != 200:
         return "Error"
     result = resp.json()
+
     return Prediction(
         segments=result["segments"],
         labels=result["labels"],
         scores=result["scores"],
+        id=result["id"],
     )
