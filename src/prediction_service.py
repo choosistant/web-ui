@@ -74,6 +74,7 @@ def predict(review_text) -> Prediction:
     payload = {
         "url": "https://localhost/",
         "review_text": review_text,
+        # "model_type": 'qa','seq2seq'
     }
     resp = requests.post(url=API_SERVER_URL, json=payload)
     if resp.status_code != 200:

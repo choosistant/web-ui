@@ -71,7 +71,7 @@ def convert_prediction_items_to_text(
     return result_text
 
 
-def choosistant(review_text):
+def choosistant(review_text, model_type):
     # Let the prediction service do its magic.
     prediction: Prediction = predict(review_text)
 
@@ -101,20 +101,30 @@ def main():
         text_input = gr.Textbox(
             lines=8, placeholder="Enter the review text here...", label="Review Text"
         )
+        model_input = gr.Radio(
+            choices=["QA", "SEQ2SEQ"],
+            label="Model Choice",
+            show_label=True,
+            interactive=True,
+            type="value",
+        )
+
         text_button = gr.Button("Submit")
         txt_pred_id = gr.Textbox(label="ID", visible=False)
         txt_predictions = gr.HighlightedText(label="Predictions", combine_adjacent=True)
         txt_predictions.style(color_map={"drawback": "red", "benefit": "green"})
 
         text_button.click(
-            choosistant, inputs=[text_input], outputs=[txt_predictions, txt_pred_id]
+            choosistant,
+            inputs=[text_input, model_input],
+            outputs=[txt_predictions, txt_pred_id],
         )
         with gr.Row():
             btn_incorrect = gr.Button("Flag as incorrect")
             btn_insufficient = gr.Button("Flag as insufficient")
             btn_other = gr.Button("Flag as other")
         flagging_handler.setup(
-            components=[text_input, txt_predictions, txt_pred_id],
+            components=[text_input, model_input, txt_predictions, txt_pred_id],
             flagging_dir="data/flagged",
         )
 
@@ -122,7 +132,7 @@ def main():
             lambda *args: flagging_handler.flag(
                 flag_data=args, flag_option="Incorrect"
             ),
-            [text_input, txt_predictions, txt_pred_id],
+            [text_input, model_input, txt_predictions, txt_pred_id],
             None,
             preprocess=False,
         )
@@ -130,13 +140,13 @@ def main():
             lambda *args: flagging_handler.flag(
                 flag_data=args, flag_option="Insufficient"
             ),
-            [text_input, txt_predictions, txt_pred_id],
+            [text_input, model_input, txt_predictions, txt_pred_id],
             None,
             preprocess=False,
         )
         btn_other.click(
             lambda *args: flagging_handler.flag(flag_data=args, flag_option="Other"),
-            [text_input, txt_predictions, txt_pred_id],
+            [text_input, model_input, txt_predictions, txt_pred_id],
             None,
             preprocess=False,
         )
