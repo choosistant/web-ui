@@ -78,11 +78,12 @@ def choosistant(review_text: str, model_type: str):
     items = prediction.non_empty_benefits + prediction.non_empty_drawbacks
     highlighted_entities = []
     for item in items:
-        start_index = review_text.index(item.text)
-        end_index = start_index + len(item.text)
-        highlighted_entities.append(
-            {"start": start_index, "end": end_index, "entity": item.label}
-        )
+        if item.text in review_text:
+            start_index = review_text.index(item.text)
+            end_index = start_index + len(item.text)
+            highlighted_entities.append(
+                {"start": start_index, "end": end_index, "entity": item.label}
+            )
 
     highlighted_input = {
         "text": review_text,
