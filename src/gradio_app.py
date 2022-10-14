@@ -176,7 +176,7 @@ def main():
                 inputs=[text_input, model_input],
                 fn=choosistant,
                 outputs=[txt_predictions, txt_pred_id],
-                cache_examples=True,
+                cache_examples=False,
             )
 
         with gr.Tab("Examples B"):  # examples of bad predictions
@@ -202,7 +202,7 @@ def main():
                 inputs=[text_input, model_input],
                 fn=choosistant,
                 outputs=[txt_predictions, txt_pred_id],
-                cache_examples=True,
+                cache_examples=False,
             )
         with gr.Tab("Examples C"):  # examples of edge cases
             gr.Examples(
@@ -219,7 +219,7 @@ def main():
                 inputs=[text_input, model_input],
                 fn=choosistant,
                 outputs=[txt_predictions, txt_pred_id],
-                cache_examples=True,
+                cache_examples=False,
             )
 
     iface.launch(debug=True, server_port=8090)
