@@ -71,9 +71,9 @@ def convert_prediction_items_to_text(
     return result_text
 
 
-def choosistant(review_text, model_type):
+def choosistant(review_text: str, model_type: str):
     # Let the prediction service do its magic.
-    prediction: Prediction = predict(review_text)
+    prediction: Prediction = predict(review_text=review_text, model_type=model_type)
 
     items = prediction.non_empty_benefits + prediction.non_empty_drawbacks
     highlighted_entities = []
@@ -102,8 +102,9 @@ def main():
             lines=8, placeholder="Enter the review text here...", label="Review Text"
         )
         model_input = gr.Radio(
-            choices=["QA", "SEQ2SEQ"],
+            choices=["qa", "seq2seq"],
             label="Model Choice",
+            value="qa",
             show_label=True,
             interactive=True,
             type="value",
@@ -151,33 +152,70 @@ def main():
             preprocess=False,
         )
 
-        with gr.Tab("Examples A"):
+        with gr.Tab("Examples A"):  # examples of good predictions
             gr.Examples(
                 examples=[
                     [
-                        "I purchased this harddrive to backup my other harddrives. It just crashed on me & I am currently on the phone trying about to be charged thousands of dollars to get data recovery on something I haven't even had for 6 months. DO NOT PURCHASE. Its cheap & faulty. Horrible quality and very sensitive. I did not drop it anywhere or damage it in any way. It just sat on my desk"  # noqa: E501
+                        "Great price on sale. Would be 5 star if it had a card reader slot. The operating system is using 13.5GB of space leaving 18.5GB of useable space. Web camera is pretty bad, only 640x480. Great battery life. Nice size and weight, the 1080p, anti-glare, IPS screen is the best feature. Trackpad is nice and responsive. both USB-A ports seem tight and a bit cheap, but they work and otherwise I'm very happy so far with this Chromebook.",  # noqa: E501
+                        "qa",
                     ],
                     [
-                        "Expensive, but I think it's the only legit Polar Express train set available, and the kids love Polar Express; what can you do?The track you get with the train makes a small oval shape, and is pretty easy to fit together. Slightly easier than Lego, but harder than Trackmaster stuff.The bell that comes with the train is really bad, we've had cat toys which resembled a bell better than this one, which is a real shame. It just kind of rattles around.The train itself is pretty well made, stays on the track, and can go forwards and backwards; as well as playing sound clips from the film, a nice chug chug sound, and steaming sound when it's stationary.Overall, giving it four stars. It's really expensive and the bell is awful, but the kids really love it"  # noqa: E501
+                        "This is a counterfeit product. Please do not buy!",
+                        "seq2seq",
+                    ],
+                    [
+                        "Expensive, but I think it's the only legit Polar Express train set available, and the kids love Polar Express; what can you do?The track you get with the train makes a small oval shape, and is pretty easy to fit together. Slightly easier than Lego, but harder than Trackmaster stuff.The bell that comes with the train is really bad, we've had cat toys which resembled a bell better than this one, which is a real shame. It just kind of rattles around.The train itself is pretty well made, stays on the track, and can go forwards and backwards; as well as playing sound clips from the film, a nice chug chug sound, and steaming sound when it's stationary.Overall, giving it four stars. It's really expensive and the bell is awful, but the kids really love it",  # noqa: E501
+                        "qa",
+                    ],
+                    [
+                        "Really want to love this bag but The water leaking from the pipe after 2 hikes",  # noqa: E501
+                        "seq2seq",
                     ],
                 ],
-                inputs=[text_input],
+                inputs=[text_input, model_input],
                 fn=choosistant,
                 outputs=[txt_predictions, txt_pred_id],
                 cache_examples=True,
             )
 
-        with gr.Tab("Examples B"):
+        with gr.Tab("Examples B"):  # examples of bad predictions
             gr.Examples(
                 examples=[
                     [
-                        "Not sure why I jumped on the bandwagon and got this. After seeing the price of the bottle of gel that you have to use with it, I knew I had been had. Now even that ~$25 bottle of gel is no longer available on Amazon -- its replacement is almost twice as expensive. Nuface says you cannot use Aloe Vera or anything else, you must use their product for the best results. Anyway, after using this ~1 month, I packed it away.Definitely do not recommend"  # noqa: E501
+                        "I purchased these scissors as I have dexterity problems and find using normal scissors quite hard & painful to grip, these are excellent, they are easy to grip, they cut easily without having to exert too much pressure so they do not hurt my hands, plus they are super sharp so cut very easily.",  # noqa: E501
+                        "qa",
                     ],
                     [
-                        "Okay so FIRST the mounting process is a… PROCESS. the included template is helpful but the line in the middle of the template is NOT center.Be glad I saved you that headache.The other thing you need to know is the additional OEM frames are a bit of a nightmare. I was able to score the tv + frame for $999 together on Black Friday and I’m so glad I did because paying $150~ ish dollars for the plastic frames is really annoying when you discover that the poor packaging design means they arrive broken!! Go look at the reviews for the optional Samsung frames. If you’re patient and deal with the returns and reorder until it’s right it will work out but you’ve been warned okay?Alright all that aside the TV is gorgeous.\nI’m so happy with it. Picture quality is good my only complaint is that the screen should be more anti-reflective. It’s not as reflective as straight glass but with any lamps or windows you might be annoyed by the glare If you’re a design snob/observant enough in the first place to be looking at this tv. Regardless of the glare and the stupid overpriced bezels (which IMO are completely necessary if you want this tv since the whole point is to look like a frame) I would still repurchase because it’s just stunning to look at.Also the art subscription- just don’t.There’s not enough art to warrant $5 a month and you can upload your own pictures (of artwork that you can find on google for FREE) to the TV via the smart things app.They’ve shorted the free subscription to ONE month with a new tv purchase and it’s still not worth it. Just google your favorite art, save it in a high quality resolution and voilà."  # noqa: E501
+                        "Not sure if it’s because I bought from Amazon, but the formula is somewhat runny when trying to apply to lips. I have this in a different flavor and bought it at Sephora and the consistency is different. Still love it though, smells great!",  # noqa: E501
+                        "seq2seq",
+                    ],
+                    [
+                        "The scents are amazing however 3 of the oils lids were not on tight and they spilled in the package. The 3 oils were not full due to this problem. Also the packaging was all oily due to this. If this was a gift for someone I would be embarrassed.",  # noqa: E501
+                        "qa",
+                    ],
+                    [
+                        "Very easy to handle. Great on felt material and anything else. Very precise. Also durable.",  # noqa: E501
+                        "qa",
                     ],
                 ],
-                inputs=[text_input],
+                inputs=[text_input, model_input],
+                fn=choosistant,
+                outputs=[txt_predictions, txt_pred_id],
+                cache_examples=True,
+            )
+        with gr.Tab("Examples C"):  # examples of edge cases
+            gr.Examples(
+                examples=[
+                    [
+                        "Me acabaron de llegar, inicialmente me gustaron, diseño, sonido etc. Pero salí con ellos a la calle y el sonido se entrecorta me sentí frustrada porque pagar un precio elevado por algo así no me parece justo",  # noqa: E501
+                        "seq2seq",
+                    ],
+                    [
+                        "I had this unit professionally installed and immediately noticed the flow was incredibly slow, almost a trickle. I called aqua sauna and they told me to put a quarter underneath the filter because sometimes the filters are not cut right by the manufacturer. I had the plumber back and he did this and the flow was better but when he put the unit back together it started leaking even when the water was turned off under the cabinet. The plumber disconnected the unit.. I'll have to return it.. ugh",  # noqa: E501
+                        "qa",
+                    ],
+                ],
+                inputs=[text_input, model_input],
                 fn=choosistant,
                 outputs=[txt_predictions, txt_pred_id],
                 cache_examples=True,
