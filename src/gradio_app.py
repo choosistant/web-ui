@@ -71,9 +71,11 @@ def convert_prediction_items_to_text(
     return result_text
 
 
+
 def choosistant(review_text: str, model_type: str):
     # Let the prediction service do its magic.
     prediction: Prediction = predict(review_text=review_text, model_type=model_type)
+
 
     items = prediction.non_empty_benefits + prediction.non_empty_drawbacks
     highlighted_entities = []
@@ -177,6 +179,7 @@ def main():
                 outputs=[txt_predictions, txt_pred_id],
                 cache_examples=True,
             )
+
 
         with gr.Tab("Examples B"):  # examples of bad predictions
             gr.Examples(
